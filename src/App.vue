@@ -12,12 +12,23 @@ export default {
 </script>
 
 <style>
+/* * {
+  -webkit-overflow-scrolling: auto;
+
+  overscroll-behavior: unset;
+} */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: block;
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>

@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import tiktokHome from "./view/home";
+import tiktokHome from "../view/home";
 Vue.use(VueRouter);
 
 const routes = [

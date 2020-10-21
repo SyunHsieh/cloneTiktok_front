@@ -41,13 +41,14 @@ export default {
     _registerScrollEvents() {
       let _body = document.querySelector("body");
       let _scrollInfo_InnerF = scrollInfo_InnerFunc(_body);
-      // let this = this;
+
       let _preElesType = [];
       return () => {
         let _rules = this.triggerRules;
         if (!_rules || !this.$children) return;
 
         let _eles = [];
+
         for (let i in this.$children) {
           if (this.$children[i].$options.name == "inViewportItem")
             _eles.splice(_eles.length, 0, this.$children[i]);
