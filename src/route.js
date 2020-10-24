@@ -1,10 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import tiktokHome from "../view/home";
-import login from "../view/login";
-import register from "../view/register";
-import createPost from "../view/createPost";
-
 Vue.use(VueRouter);
 
 const routes = [
@@ -19,22 +15,6 @@ const routes = [
     path: "/user/:userid",
     name: "user",
     component: tiktokHome,
-  },
-  {
-    path: "/login",
-    name: "login",
-    component: login,
-  },
-
-  {
-    path: "/register",
-    name: "register",
-    component: register,
-  },
-  {
-    path: "/createPost",
-    name: "createPost",
-    component: createPost,
   },
 ];
 
