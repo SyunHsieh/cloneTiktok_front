@@ -3,9 +3,20 @@
     <!-- <div class="rightDiv">
       <div class="rightContent"></div>
     </div> -->
+    <commentsPage
+      v-if="homePageData.length > 0"
+      :currentCommentId="homePageData[currentPostIndex].postInfo.id"
+      ref="commentsDiv"
+      v-on:deactivePage="commentPageDeactive"
+      v-on:commentCountUpdate="updateCommentCountEvent"
+    />
     <div class="topbar">
       <button class="searchBtn">
-        <svg class="toolIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <svg
+          class="toolIcon"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+        >
           <g data-name="Layer 2">
             <g data-name="search">
               <rect width="24" height="24" opacity="0" />
@@ -17,27 +28,70 @@
         </svg>
       </button>
     </div>
-    <itemInViewportList ref="IVList" :that="this" :triggerRules="rules" v-on:scrollInViewport="itemInViewportFunc" inline-template>
+    <itemInViewportList
+      :detectScrollElement="window"
+      ref="IVList"
+      :that="this"
+      :triggerRules="rules"
+      v-on:scrollInViewport="itemInViewportFunc"
+      inline-template
+    >
       <div>
-        <inViewportItem :that="that" v-for="(postData, index) in that.homePageData" :key="postData.postInfo.id + '' + index" inline-template>
+        <inViewportItem
+          :that="that"
+          v-for="(postData, index) in that.homePageData"
+          :key="postData.postInfo.id + '' + index"
+          inline-template
+        >
           <div class="item">
             <div class="socialToolsDiv">
               <button
                 class="toolsbtn"
                 :class="postData.readersInfo.liked ? 'liked' : ''"
-                @click="that._setLikePost(postData.postInfo.id, !postData.readersInfo.liked)"
+                @click="
+                  that._setLikePost(
+                    postData.postInfo.id,
+                    !postData.readersInfo.liked
+                  )
+                "
               >
-                <svg class="toolIcon" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 98 98">
-                  <g data-name="&lt;Group&gt;">
-                    <path
-                      d="M66.1,16.3A22.2,22.2,0,0,0,49,24.2a21.9,21.9,0,0,0-17.1-7.9A22.4,22.4,0,0,0,9.5,38.7c0,21.2,37,41.9,38.5,42.7a1.8,1.8,0,0,0,2,0c1.5-.8,38.5-21.2,38.5-42.7A22.4,22.4,0,0,0,66.1,16.3ZM49,77.4C43.2,74,13.5,55.9,13.5,38.7A18.4,18.4,0,0,1,31.9,20.3a18,18,0,0,1,15.4,8.3,2.1,2.1,0,0,0,3.4,0A18.4,18.4,0,0,1,84.5,38.7C84.5,56.1,54.8,74.1,49,77.4Z"
-                      data-name="&lt;Compound Path&gt;"
-                    />
-                  </g></svg
-                ><span>{{ postData.postInfo.likesCount }}</span>
+                <svg
+                  class="toolIcon"
+                  viewBox="0 0 47.5 47.5"
+                  style="enable-background: new 0 0 47.5 47.5"
+                >
+                  <defs id="defs6">
+                    <clipPath id="clipPath16" clipPathUnits="userSpaceOnUse">
+                      <path id="path18" d="M 0,38 38,38 38,0 0,0 0,38 Z" />
+                    </clipPath>
+                  </defs>
+                  <g transform="matrix(1.25,0,0,-1.25,0,47.5)" id="g10">
+                    <g id="g12">
+                      <g clip-path="url(#clipPath16)" id="g14">
+                        <g transform="translate(36.8848,25.1665)" id="g20">
+                          <path
+                            id="path22"
+                            style="
+                              fill-opacity: 1;
+                              fill-rule: nonzero;
+                              stroke: none;
+                            "
+                            d="m 0,0 c 0,5.45 -4.418,9.868 -9.867,9.868 -3.308,0 -6.227,-1.633 -8.018,-4.129 -1.79,2.496 -4.71,4.129 -8.017,4.129 -5.45,0 -9.868,-4.418 -9.868,-9.868 0,-0.772 0.098,-1.52 0.266,-2.241 1.371,-8.512 10.835,-17.494 17.619,-19.96 6.783,2.466 16.249,11.448 17.617,19.96 C -0.098,-1.52 0,-0.772 0,0"
+                          />
+                        </g>
+                      </g>
+                    </g>
+                  </g>
+                </svg>
+
+                <span>{{ postData.postInfo.likesCount }}</span>
               </button>
-              <button class="toolsbtn">
-                <svg class="toolIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <button @click="that.commentsClick" class="toolsbtn">
+                <svg
+                  class="toolIcon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     d="M8,11a1,1,0,1,0,1,1A1,1,0,0,0,8,11Zm4,0a1,1,0,1,0,1,1A1,1,0,0,0,12,11Zm4,0a1,1,0,1,0,1,1A1,1,0,0,0,16,11ZM12,2A10,10,0,0,0,2,12a9.89,9.89,0,0,0,2.26,6.33l-2,2a1,1,0,0,0-.21,1.09A1,1,0,0,0,3,22h9A10,10,0,0,0,12,2Zm0,18H5.41l.93-.93a1,1,0,0,0,.3-.71,1,1,0,0,0-.3-.7A8,8,0,1,1,12,20Z"
                   />
@@ -51,7 +105,12 @@
               <span>{{ postData.postInfo.text }}</span>
             </div>
             <video
-              v-if="index == that.currentPostIndex"
+              :id="['video' + index]"
+              v-if="
+                index == that.currentPostIndex ||
+                index == that.currentPostIndex - 1 ||
+                index == that.currentPostIndex + 1
+              "
               class="video"
               contorls
               :autoplay="index == that.currentPostIndex"
@@ -73,11 +132,12 @@
 <script>
 import itemInViewportList from "../src/components/itemInViewportList";
 import inViewportItem from "../src/components/itemInViewportList/inViewportItem";
+import commentsPage from "../src/components/commentsPage";
 import Vue from "vue";
 import sywekAxios from "../src/reference/axiosMsgReaction";
 export default {
   name: "tiktokHome",
-  components: { itemInViewportList, inViewportItem },
+  components: { itemInViewportList, inViewportItem, commentsPage },
   data() {
     return {
       //homepage data
@@ -90,14 +150,58 @@ export default {
       triggeredItemIndex: undefined,
       currentPostIndex: 0,
       homePageData: [],
+      window: window,
     };
   },
+  watch: {
+    currentPostIndex: function () {
+      //paly current video and reset another 2 videos(prev and next);
+      let _resetVideo = (video) => {
+        if (video == undefined) return;
+        video.pause();
+        video.currentTime = 0;
+      };
+      let _curVideo = document.getElementById(`video${this.currentPostIndex}`);
+      let _prevVideo = document.getElementById(`video${this.currentPostIndex}`);
+      let _nextVideo = document.getElementById(`video${this.currentPostIndex}`);
+      _resetVideo(_prevVideo);
+      _resetVideo(_nextVideo);
+      _curVideo.currentTime = 0;
+      _curVideo.play();
+    },
+  },
   methods: {
+    updateCommentCountEvent(postid, commentscount) {
+      this.homePageData.map((v) => {
+        if (v.postInfo.id == postid) {
+          v.postInfo.commentsCount = commentscount;
+        }
+      });
+    },
+    commentPageDeactive() {
+      let _body = document.querySelector("body");
+      _body.classList.remove("disableScroll");
+    },
+    commentsClick() {
+      this.$refs.commentsDiv.activePage();
+      let _body = document.querySelector("body");
+      _body.classList.add("disableScroll");
+    },
     async _setLikePost(postid, like) {
-      console.log(postid, like);
+      let _apiPath = `/post/${postid}/like`;
       let _data = like
-        ? await sywekAxios.post(process.env.VUE_APP_API_URL + `/like/${postid}`, {}, {}, true)
-        : await sywekAxios.delete(process.env.VUE_APP_API_URL + `/like/${postid}`, {}, {}, true);
+        ? await sywekAxios.post(
+            process.env.VUE_APP_API_URL + _apiPath,
+            {},
+            {},
+            true
+          )
+        : await sywekAxios.delete(
+            process.env.VUE_APP_API_URL + _apiPath,
+            {},
+            {},
+            true
+          );
 
       if (_data.data) {
         for (let i in this.homePageData) {
@@ -145,7 +249,8 @@ export default {
       Vue.set(this, "triggeredItemIndex", e[0].index);
     },
     async afterTouchEndFunc() {
-      if (this.currentPostIndex == this.homePageData.length - 2) this.getPostData();
+      if (this.currentPostIndex == this.homePageData.length - 2)
+        this.getPostData();
     },
     async getPostData() {
       let _data = await sywekAxios.get(
@@ -199,7 +304,7 @@ export default {
 
       window.scrollTo(0, _itemTop);
       this.currentPostIndex = this.triggeredItemIndex;
-      console.log("a", this.currentPostIndex);
+
       this.triggeredItemIndex = undefined;
       this._autoSetRules();
 
@@ -268,7 +373,9 @@ export default {
   height: 2.5rem;
   fill: white;
 }
-
+.toolIcon path {
+  fill: white;
+}
 .topbar {
   position: fixed;
   top: 0;
@@ -306,7 +413,10 @@ export default {
   margin-top: 0.5rem;
   border-radius: 0.4rem;
 }
-.liked svg {
+.liked path {
   fill: red;
+}
+.disableScroll {
+  overflow: hidden;
 }
 </style>

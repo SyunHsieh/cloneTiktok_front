@@ -57,4 +57,8 @@ svg {
   display: block;
   margin-top: 6rem;
 }
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent; /* make scrollbar transparent */
+}
 </style>

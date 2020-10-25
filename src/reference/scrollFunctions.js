@@ -7,8 +7,8 @@ const isElementInViewport = (el, inViewType = "whole") => {
     _elLeft = Math.round(_elBCRect.left),
     _elRight = Math.round(_elBCRect.right);
 
-  let _viewportHeight = document.documentElement.clientHeight || window.innerHeight,
-    _viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+  let _viewportHeight = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight,
+    _viewportWidth = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth;
 
   // Caculate is el's edges in viewport?
   let _isElTopInViewport = _elTop >= 0 && _elTop <= _viewportHeight,
@@ -23,10 +23,10 @@ const isElementInViewport = (el, inViewType = "whole") => {
 
 const scrollInfo_InnerFunc = (_el) => {
   let _getScrollX = () => {
-      return Math.round(window.pageXOffset || _el.scrollLeft);
+      return Math.round(_el.scrollLeft ? _el.scrollLeft : window.pageXOffset || _el.scrollLeft);
     },
     _getScrollY = () => {
-      return Math.round(window.pageYOffset || _el.scrollTop);
+      return Math.round(_el.scrollTop ? _el.scrollTop : window.pageYOffset);
     };
 
   let _preXPos = _getScrollX(),

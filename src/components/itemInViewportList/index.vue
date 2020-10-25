@@ -21,10 +21,11 @@ export default {
   // }]
   name: "itemInViewportList",
   components: { inViewportItem },
-  props: ["triggerRules", "that"],
+  props: ["triggerRules", "that", "detectScrollElement"],
   data() {
     return {
       triggerFunction: undefined,
+      scrollElements: undefined,
     };
   },
   methods: {
@@ -38,9 +39,9 @@ export default {
 
       return isElementInViewport(_eles[itemIndex].$el, displayType);
     },
+
     _registerScrollEvents() {
-      let _body = document.querySelector("body");
-      let _scrollInfo_InnerF = scrollInfo_InnerFunc(_body);
+      let _scrollInfo_InnerF = scrollInfo_InnerFunc(this.scrollElements);
 
       let _preElesType = [];
       return () => {
@@ -58,7 +59,7 @@ export default {
           return;
 
         if (_preElesType.length != _rules.length)
-          for (let i in _rules)
+          for (let i in _rules) {
             _preElesType.splice(
               i,
               0,
@@ -67,6 +68,7 @@ export default {
                 _rules[i].inViewportType
               )
             );
+          }
 
         let _ret = [];
 
@@ -105,7 +107,9 @@ export default {
           _preElesType[ruleIndex] = true;
         }
 
-        if (_ret.length > 0) this.$emit("scrollInViewport", _ret);
+        if (_ret.length > 0) {
+          this.$emit("scrollInViewport", _ret);
+        }
       };
     },
     _checkRules(_rules, elLength) {
@@ -137,12 +141,15 @@ export default {
     },
   },
   mounted() {
+    if (typeof this.detectScrollElement == "function")
+      this.scrollElements = this.detectScrollElement();
+    else this.scrollElements = this.detectScrollElement;
+
     this.triggerFunction = this._registerScrollEvents();
-    window.addEventListener("scroll", this.triggerFunction);
+    this.scrollElements.addEventListener("scroll", this.triggerFunction);
   },
   destroyed() {
-    let _body = document.querySelector("body");
-    _body.removeEventListener("scroll", this.triggerFunction);
+    this.scrollElements.removeEventListener("scroll", this.triggerFunction);
   },
 };
 </script>
