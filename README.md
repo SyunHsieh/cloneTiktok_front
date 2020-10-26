@@ -1,6 +1,6 @@
 ![vuejs-wide](https://user-images.githubusercontent.com/8532735/97205758-d5b70d00-17f2-11eb-860f-ebe2f5f46641.png)
 
-# Clone Tiktok frontend
+# Clone Tiktok Frontend
   
 ## 目的
     1. 主要想使用Laravel 製作server ，並做一個簡易的clone tiktok project.
@@ -10,7 +10,7 @@
 ### **主要支援Mobile mode ,沒有RWD.
 ### **ios上無法於scroll post後 auto play 正在找方法。
     
-   ## Demo video
+   ## Links
 [ DEMO Video on YT](https://youtu.be/wb_pEa6ka9Y)   
 [ Backend Laravel on Github](https://github.com/SyunSie/cloneTiktok_back)   
 [  Online DEMO Hosting on GAE](https://practice-clonetiktok.df.r.appspot.com/#/) **** 沒有RWD , 請用 MOBILE MODE****
