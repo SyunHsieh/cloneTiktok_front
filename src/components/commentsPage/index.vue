@@ -111,7 +111,7 @@ export default {
         inViewportType: "block",
       });
       Vue.set(this, "inViewportRules", _rules);
-      console.log(this.inViewportRules);
+      this.inViewportRules;
     },
     async sendComment() {
       let _ret = await sywekAxios.post(
@@ -146,16 +146,16 @@ export default {
 };
 </script>
 
-<style >
+<style>
 .commentsDiv {
   background-color: rgb(38, 42, 43);
   /* background-color: #333; */
   border-radius: 1rem 1rem 0 0;
   position: fixed;
   width: 100%;
-  height: 50vh;
+  height: 70vh;
 
-  top: 100vh;
+  bottom: -100vh;
   left: 0;
   right: 0;
 
@@ -166,7 +166,7 @@ export default {
   flex-direction: column;
 }
 .commentsDivActive {
-  top: 50vh;
+  bottom: 0;
 }
 .comment-topdiv {
   color: white;
@@ -195,12 +195,15 @@ export default {
   color: aliceblue;
 }
 .commentEditDiv {
+  height: 2.5rem;
+
   width: 100%;
   display: flex;
   flex-direction: row;
 }
 .commentEditDiv > input {
   width: 100%;
+  font-size: 2rem;
 }
 .commentEditDiv > button {
   width: 5rem;

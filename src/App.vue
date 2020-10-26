@@ -20,12 +20,18 @@ export default {
 button {
   outline: none;
 }
+
 html,
 body {
   margin: 0;
   padding: 0;
   width: 100%;
   display: block;
+  overflow-y: hidden;
+}
+body {
+  overflow-y: scroll !important;
+  height: 100vh;
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

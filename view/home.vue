@@ -29,7 +29,7 @@
       </button>
     </div>
     <itemInViewportList
-      :detectScrollElement="window"
+      :detectScrollElement="scrollDetectEle"
       ref="IVList"
       :that="this"
       :triggerRules="rules"
@@ -105,6 +105,7 @@
               <span>{{ postData.postInfo.text }}</span>
             </div>
             <video
+              @click="that.videoClick"
               :id="['video' + index]"
               v-if="
                 index == that.currentPostIndex ||
@@ -116,6 +117,7 @@
               :autoplay="index == that.currentPostIndex"
               :muted="index != that.currentPostIndex"
               loop
+              playsinline
             >
               <source :src="postData.postInfo.videourl" type="video/mp4" />
             </video>
@@ -150,7 +152,8 @@ export default {
       triggeredItemIndex: undefined,
       currentPostIndex: 0,
       homePageData: [],
-      window: window,
+      scrollDetectEle: document.querySelector("body"),
+      isFetching: false,
     };
   },
   watch: {
@@ -158,19 +161,30 @@ export default {
       //paly current video and reset another 2 videos(prev and next);
       let _resetVideo = (video) => {
         if (video == undefined) return;
+
         video.pause();
         video.currentTime = 0;
       };
       let _curVideo = document.getElementById(`video${this.currentPostIndex}`);
-      let _prevVideo = document.getElementById(`video${this.currentPostIndex}`);
-      let _nextVideo = document.getElementById(`video${this.currentPostIndex}`);
+      let _prevVideo = document.getElementById(
+        `video${this.currentPostIndex - 1}`
+      );
+      let _nextVideo = document.getElementById(
+        `video${this.currentPostIndex + 1}`
+      );
       _resetVideo(_prevVideo);
       _resetVideo(_nextVideo);
+
       _curVideo.currentTime = 0;
       _curVideo.play();
     },
   },
   methods: {
+    videoClick(e) {
+      const _video = e.target;
+      const _played = _video.paused;
+      _played ? _video.play() : _video.pause();
+    },
     updateCommentCountEvent(postid, commentscount) {
       this.homePageData.map((v) => {
         if (v.postInfo.id == postid) {
@@ -223,8 +237,11 @@ export default {
       return undefined;
     },
     _autoSetRules() {
+      //inViewport Rules
+      //currentindex 前後各一個inViewportItem
       let _rules = [];
       //set preverse item
+
       if (this.currentPostIndex != 0)
         _rules.splice(0, 0, {
           index: this.currentPostIndex - 1,
@@ -253,6 +270,9 @@ export default {
         this.getPostData();
     },
     async getPostData() {
+      //fetch data lock
+      if (this.isFetching) return;
+      this.isFetching = true;
       let _data = await sywekAxios.get(
         process.env.VUE_APP_API_URL + "/posts",
         {
@@ -264,12 +284,15 @@ export default {
         true
       );
 
+      //當return length < fetch count 代表到最後一筆資料
       let _length = _data.data.length;
       if (_length < this.fetchOffset) {
         this.isFetchedEndposts = true;
       }
+
       this.fetchOffset += _length;
 
+      //當最後一筆 下一次從0開始取資料
       if (this.isFetchedEndposts) {
         this.fetchOffset = 0;
       }
@@ -277,7 +300,9 @@ export default {
       _data.data.map((v) => {
         this.homePageData.splice(this.homePageData.length, 0, v);
       });
-
+      this._autoSetRules();
+      //unlock
+      this.isFetching = false;
       return _data;
     },
   },
@@ -290,24 +315,51 @@ export default {
     //5.   touchStart should reset this.triggeredItemIndex
     //6.    touchEnd should move scroll to next/preverse item,and reset rules
     //7. after touchend run this.afterTouchend Function.(Fetch new data here)
+
+    let _intervelId = undefined;
+    let _targetYPos = 0;
+    const _scrollPosMatchTimes = 20;
+    let _scrollMatchCoount = 0;
+
+    let _clearAutoScroll = () => {
+      clearInterval(_intervelId);
+      _intervelId = undefined;
+    };
+    //用來自動scroll 到目標
+    let _autoScroll = () => {
+      if (_intervelId != undefined) return;
+      _intervelId = setInterval(() => {
+        this.scrollDetectEle.scrollTo(0, _targetYPos);
+        //check position
+        if (Math.abs(this.scrollDetectEle.scrollTop - _targetYPos) < 3) {
+          if (_scrollMatchCoount == _scrollPosMatchTimes) {
+            _clearAutoScroll();
+            _scrollMatchCoount = 0;
+          } else _scrollMatchCoount += 1;
+        }
+      }, 10);
+    };
+
     await this.getPostData();
-    this._autoSetRules();
-    //reset triggeredItemIndex when mouse down
+    //reset triggeredItemIndex when touch start
     window.addEventListener("touchstart", () => {
       this.triggeredItemIndex = undefined;
     });
 
-    //move scroll to detected item top
     window.addEventListener("touchend", () => {
       if (this.triggeredItemIndex == undefined) return;
+      //抓取 inViewportList scrollTop
       const _itemTop = this._getViewportItemTop(this.triggeredItemIndex);
+      //放到 autoScroll param
+      _targetYPos = _itemTop;
+      //設定自動scroll
+      _autoScroll();
 
-      window.scrollTo(0, _itemTop);
+      //設定currentIndex
       this.currentPostIndex = this.triggeredItemIndex;
 
-      this.triggeredItemIndex = undefined;
+      //自動設定 itemInViewportList rules
       this._autoSetRules();
-
       this.afterTouchEndFunc();
     });
   },
@@ -341,11 +393,12 @@ export default {
   position: relative;
   width: 100%;
   height: 100vh;
+  margin: 0;
 }
 .postDiv {
   position: absolute;
   left: 1rem;
-  bottom: 3rem;
+  bottom: 7rem;
   text-align: left;
   color: white;
   max-width: 50%;
@@ -397,7 +450,7 @@ export default {
 .bottombar {
   position: fixed;
   /* background-color: #111; */
-  height: 3rem;
+  height: 4rem;
   bottom: 0;
   left: 0;
   right: 0;
