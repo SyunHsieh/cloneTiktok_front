@@ -31,8 +31,3 @@
 2. 主要使用Vuejs 建立SPA , 主要用restful API 和backend(Laravel)發出Request,並依照Response進行render
 
     
-
-
-<hr/>
-## License
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
